@@ -21,27 +21,33 @@ h1 {
 }
 
 .container {
-  background-image: url(./assets/summer-bg.jpg);
+  --before-bg: url('../public/assets/summer-bg.jpg');
+  position: relative;
   height: 100vh;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% + 10px);
+    height: calc(100% + 10px);
+    margin: -5px 0 0 -5px;
+    background-image: var(--before-bg);
+    background-size: cover;
+    background-position: center;
+    filter: blur(5px);
+    z-index: -1;
+  }
 }
+
 
 .button-menu {
   display: flex;
   column-gap: 15px;
   justify-content: center;
   margin-bottom: 20px;
-
-  > :first-child {
-    background-image: url(./assets/summer-bg.jpg);
-  }
-
-  > :nth-child(2) {
-    background-image: url(./assets/rainy-bg.jpg);
-  }
-
-  > :last-child {
-    background-image: url(./assets/winter-bg.jpg);
-  }
 
   // .button-menu__play
   &__play {
@@ -65,13 +71,10 @@ h1 {
 
   // .button-menu__icon
   &__icon {
-
     width: 50px;
     height: 50px;
 
   }
-
-
 
   // .button-menu__icon-pause
   &__icon-pause {
@@ -79,37 +82,32 @@ h1 {
     bottom: 15px;
     left: 50%;
     transform: translate(-50%, 0);
-    opacity: 0;
+    /*  opacity: 0; */
     pointer-events: none;
     user-select: none;
   }
-
 }
 
-.volume-menu {
-  display: flex;
-  justify-content: center;
+.volume__input {
+  display: block;
+  text-align: center;
+  margin: 0 auto;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 7px;
+  border-radius: 4px;
 
-
-  // .volume-menu__input
-  &__input {
+  &::-webkit-slider-thumb {
     -webkit-appearance: none;
-    appearance: none;
-    height: 7px;
-    border-radius: 4px;
+    width: 14px;
+    height: 14px;
+    background: var(--thumb-color);
+    border-radius: 50%;
+    margin-top: -2px;
 
-    &::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 14px;
-      height: 14px;
-      background: var(--thumb-color);
-      border-radius: 50%;
-      margin-top: -2px;
+  }
 
-    }
-
-    &::-moz-range-thumb {
-      background: var(--thumb-color);
-    }
+  &::-moz-range-thumb {
+    background: var(--thumb-color);
   }
 }
