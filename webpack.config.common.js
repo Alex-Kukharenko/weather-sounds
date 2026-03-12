@@ -29,9 +29,12 @@ export default {
       patterns: [
         {
           from: __dirname + '/public/favicon.png',
-          to: __dirname + '/dest'
+          to: __dirname + '/dist'
         },
-
+        {
+          from: '/public/assets',
+          to: '/dist/assets'
+        },
       ],
     }),
     new MiniCssExtractPlugin(),
