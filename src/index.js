@@ -2,21 +2,37 @@ import './style.scss'
 import { data } from './js/data.js'
 import { setRangeColor } from './js/rangeInput.js'
 
-const colorRangeInput = ['#34badb', '#ddd', '#34badb']
+const COLOR_RANGE_INPUT = ['#34badb', '#ddd', '#34badb']
+const PAUSE_ICON_CLASS = 'button-menu__icon-paused'
+const PAUSE_ICON_SRC = './assets/icons/pause.svg'
+const audioMap = new Map()
+
 let currentAudio = null
-function createRangeInput() {
-  const input = document.createElement('input')
-  input.type = 'range'
-  input.min = 0
-  input.max = 100
-  input.value = 50
-  input.step = 1
-  input.className = 'volume__input'
+let volumeInput = null
 
-  setRangeColor(input, ...colorRangeInput)
 
+
+const getOrCreateAudio = (src) => {
+  if (!audioMap.has(src)) {
+    audioMap.set(src, new Audio(src))
+  }
+  return audioMap.get(src)
+}
+
+
+const createVolumeInput = () => {
+  const input = document.createElement('input');
+  Object.assign(input, {
+    type: 'range',
+    min: 0,
+    max: 100,
+    value: 50,
+    step: 1,
+    className: 'volume__input'
+  })
+  setRangeColor(input, ...COLOR_RANGE_INPUT)
   input.addEventListener('input', () => {
-    setRangeColor(input, ...colorRangeInput)
+    setRangeColor(input, ...COLOR_RANGE_INPUT)
     const volume = input.value / 100
     if (currentAudio) {
       currentAudio.volume = volume
@@ -26,66 +42,62 @@ function createRangeInput() {
   return input
 }
 
-const audioMap = {}
 
-const handleButtonClick = (data) => {
-  const container = document.querySelector('.container')
-  const iconPause = event.target.lastChild
-  container.style.setProperty('--before-bg', `url('${data.bgImg}')`)
-
-  const src = data.musicSrc
-
-  // создаём Audio только один раз для каждого src
-  if (!audioMap[src]) {
-    audioMap[src] = new Audio(src)
-  }
-  const audio = audioMap[src]
-  document.querySelectorAll('.button-menu__icon-paused').forEach((icon) => {
-    icon.style.setProperty('--opacity-btn', 0) // или убираем класс .paused
-  })
-  // если уже играет эта же мелодия – пауза
-  if (currentAudio === audio && !audio.paused) {
-    audio.pause()
-    iconPause.style.setProperty('--opacity-btn', 1)
-    return
-  }
-
-  // если играла другая – остановить её
-  if (currentAudio && currentAudio !== audio) {
-    currentAudio.pause()
-    iconPause.style.setProperty('--opacity-btn', 0)
-    currentAudio.currentTime = 0 // по желанию
-  }
-
-  currentAudio = audio
-  if (volumeInput) {
-    audio.volume = volumeInput.value / 100
-  }
-  audio.play()
-}
-
-function createButtonMenu(data) {
+const createButtonMenu = (data) => {
   const buttonMenu = document.createElement('div')
   buttonMenu.className = 'button-menu'
 
   data.forEach((item) => {
     const button = document.createElement('button')
     button.className = 'button-menu__play'
-    button.style.backgroundImage = item.bgImg ? `url('${item.bgImg}')` : 'none'
-    const iconPause = document.createElement('img')
-    iconPause.className = 'button-menu__icon-paused'
-    iconPause.src = './assets/icons/pause.svg'
-    iconPause.alt = 'icon'
+
+    if (item.bgImg) {
+      button.style.backgroundImage = `url('${item.bgImg}')`
+    }
+
     if (item.iconSrc) {
-      const img = document.createElement('img')
-      img.className = 'button-menu__icon'
-      img.src = item.iconSrc
-      img.alt = 'icon'
+      const img = Object.assign(document.createElement('img'), {
+        className: 'button-menu__icon',
+        src: item.iconSrc,
+        alt: 'icon'
+      })
       button.appendChild(img)
     }
+
+    const iconPause = Object.assign(document.createElement('img'), {
+      className: PAUSE_ICON_CLASS,
+      src: PAUSE_ICON_SRC,
+      alt: 'pause'
+    })
     button.appendChild(iconPause)
+
     button.addEventListener('click', () => {
-      handleButtonClick(item)
+      const container = document.querySelector('.container')
+      container.style.setProperty('--before-bg', `url('${item.bgImg}')`)
+
+      const audio = getOrCreateAudio(item.musicSrc)
+
+      document.querySelectorAll(`.${PAUSE_ICON_CLASS}`).forEach(icon => {
+        icon.style.setProperty('--opacity-btn', '0')
+      })
+
+      if (currentAudio === audio && !audio.paused) {
+        audio.pause()
+        iconPause.style.setProperty('--opacity-btn', '1')
+        return
+      }
+
+      if (currentAudio && currentAudio !== audio) {
+        currentAudio.pause()
+        currentAudio.currentTime = 0
+      }
+
+      currentAudio = audio
+      if (volumeInput) {
+        audio.volume = volumeInput.getVolume()
+      }
+      audio.play()
+      iconPause.style.setProperty('--opacity-btn', '0') // активна
     })
 
     buttonMenu.appendChild(button)
@@ -93,19 +105,20 @@ function createButtonMenu(data) {
 
   return buttonMenu
 }
-let volumeInput = null
-function app(data) {
+
+// App
+const initApp = () => {
   const container = document.createElement('div')
   container.className = 'container'
+
   const title = document.createElement('h1')
   title.className = 'title'
-  title.innerText = 'Whether sound'
-  volumeInput = createRangeInput()
-  container.append(title)
-  container.append(createButtonMenu(data))
-  container.append(volumeInput)
+  title.textContent = 'Whether sound'
+
+  volumeInput = createVolumeInput()
+
+  container.append(title, createButtonMenu(data), volumeInput)
   return container
 }
 
-const rootElement = document.getElementById('app')
-rootElement.append(app(data))
+document.getElementById('app').append(initApp())
