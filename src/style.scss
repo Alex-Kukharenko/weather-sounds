@@ -84,6 +84,7 @@ h1 {
     opacity: var(--opacity-btn, 0);
     pointer-events: none;
     user-select: none;
+    transition: opacity 0.3s;
   }
 }
 
