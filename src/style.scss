@@ -17,7 +17,7 @@ h1 {
   font-size: 50px;
   color: orangered;
   text-align: center;
-  padding: 30px 0 20px
+  padding: 30px 0 20px;
 }
 
 .container {
@@ -42,7 +42,6 @@ h1 {
   }
 }
 
-
 .button-menu {
   display: flex;
   column-gap: 15px;
@@ -57,7 +56,7 @@ h1 {
     height: 150px;
     border: 1px solid wheat;
     border-radius: 15px;
-    transition: all .2s ease-in;
+    transition: all 0.2s ease-in;
 
     &:hover {
       scale: 1.01;
@@ -73,16 +72,16 @@ h1 {
   &__icon {
     width: 50px;
     height: 50px;
-
+    pointer-events: none;
   }
 
-  // .button-menu__icon-pause
-  &__icon-pause {
+  // .button-menu__icon-paused
+  &__icon-paused {
     position: absolute;
     bottom: 15px;
     left: 50%;
     transform: translate(-50%, 0);
-    /*  opacity: 0; */
+    opacity: var(--opacity-btn, 0);
     pointer-events: none;
     user-select: none;
   }
@@ -91,7 +90,7 @@ h1 {
 .volume__input {
   display: block;
   text-align: center;
-  margin: 0 auto;
+  margin: 30px auto 0;
   -webkit-appearance: none;
   appearance: none;
   height: 7px;
@@ -104,7 +103,6 @@ h1 {
     background: var(--thumb-color);
     border-radius: 50%;
     margin-top: -2px;
-
   }
 
   &::-moz-range-thumb {
